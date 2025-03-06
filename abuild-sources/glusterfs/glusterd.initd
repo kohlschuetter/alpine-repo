@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/net-dns/knot/files/knot.init,v 1.2 2013/08/21 09:23:59 scarabeus Exp $
+
+name="glusterd"
+command="/usr/sbin/${name}"
+command_args="${GLUSTERD_OPTS}"
+required_files=
+
+depend() {
+	need net
+}
+
+start_pre() {
+	checkpath -d -m 0750 -o root:root /run/gluster/ /var/lib/glusterd/
+}
+
+start() {
+	if [[ -e "/var/lib/glusterd/glusterd.info" ]]; then
+		uuid=$(cat /var/lib/glusterd/glusterd.info | grep UUID= | head -n1 | cut -c6-)
+		[[ -n "$uuid" && -e "/var/lib/glusterd/peers/$uuid" ]] && rm -fv "/var/lib/glusterd/peers/$uuid"
+	fi
+
+	default_start
+}

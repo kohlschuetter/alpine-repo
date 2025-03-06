@@ -1,0 +1,22 @@
+--- a/configure
++++ b/configure
+@@ -9080,7 +9080,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking compiler and flags for sanity" >&5
+ $as_echo_n "checking compiler and flags for sanity... " >&6; }
+-if test "$cross_compiling" = yes; then :
++if true; then :
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cross compiling: not checking compiler sanity" >&5
+ $as_echo "$as_me: WARNING: cross compiling: not checking compiler sanity" >&2;}
+
+@@ -11200,7 +11200,7 @@
+
+ # Determine OpenSSL header version
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking OpenSSL header version" >&5
+ $as_echo_n "checking OpenSSL header version... " >&6; }
+-if test "$cross_compiling" = yes; then :
++if true; then :
+ 
+ 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cross compiling: not checking" >&5
+ $as_echo "$as_me: WARNING: cross compiling: not checking" >&2;}
+ 

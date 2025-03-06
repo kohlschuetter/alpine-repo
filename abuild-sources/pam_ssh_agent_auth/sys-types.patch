@@ -1,0 +1,13 @@
+Upstream: No
+Reason: Resolve missing type definitions (u_char, etc.)
+
+--- ./key.h
++++ ./key.h
+@@ -30,6 +30,7 @@
+ #include <openssl/dsa.h>
+ #include <openssl/ec.h>
+ #include <openssl/ecdsa.h>
++#include <sys/types.h>
+ #include "ed25519-donna/ed25519.h"
+ 
+ typedef struct Key Key;

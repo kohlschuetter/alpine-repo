@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="glustereventsd"
+command="/usr/sbin/${name}"
+pidfile="/run/$RC_SVCNAME.pid"
+pidsfile="/run/$RC_SVCNAME.pids"
+procname="$name"
+command_background=true
+required_files=
+
+depend() {
+	need net
+}
+
+start() {
+	default_start
+	pidof "$procname" > "$pidsfile"
+}
+
+stop()  {
+	mv "$pidsfile" "$pidfile"
+	default_stop
+}

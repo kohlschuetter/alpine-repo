@@ -1,0 +1,114 @@
+# Contributor: Christian Kohlschütter <christian@kohlschutter.com>
+# Maintainer: Christian Kohlschütter <christian@kohlschutter.com>
+pkgname=glusterfs
+pkgver=11.1_git20250306
+pkgrel=1
+pkgdesc="glusterfs"
+url="https://github.com/kohlschuetter/glusterfs"
+arch="all"
+license="GPL-2.0"
+depends="py3-requests py3-prettytable xfsprogs-extra
+	$pkgname-xlators
+	$pkgname-libs
+"
+makedepends="alpine-sdk bash autoconf automake libtool rpcgen tcmalloc-minimal gperftools-dev flex bison openssl-dev util-linux-dev acl-dev zlib-dev libxml2-dev argp-standalone liburing-dev linux-headers userspace-rcu-dev libucontext-dev libtirpc-dev libbsd-dev"
+subpackages="$pkgname-doc $pkgname-dev
+	$pkgname-xlators
+	$pkgname-fuse
+	$pkgname-libs
+"
+reltag="11.alpine.6"
+source="https://github.com/kohlschuetter/glusterfs/archive/refs/tags/${reltag}.tar.gz
+glusterd.confd
+glusterd.initd
+glustereventsd.initd
+"
+
+builddir="$srcdir/${pkgname}-${pkgname}-${pkgver}"
+
+prepare() {
+    default_prepare
+
+    cd "$srcdir/glusterfs-${reltag}"
+
+    # Fix python version check bug
+    cp -v /usr/share/aclocal-1.*/python.m4 contrib/aclocal/
+}
+
+build() {
+    cd "$srcdir/glusterfs-${reltag}"
+    CFLAGS="-DZFS_COMMAND=\\\"/usr/sbin/zfs\\\""
+    CFLAGS="$CFLAGS -DSTAT_COMMAND=\\\"/bin/stat\\\""
+    CFLAGS="$CFLAGS -DGF_WITH_GENERIC_SNAPSHOT"
+    ./autogen.sh
+    ./configure CFLAGS="${CFLAGS}" \
+      --build="${CBUILD}" \
+      --host="${CHOST}" \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --mandir=/usr/share/man \
+      --localstatedir=/var \
+      --disable-fusermount \
+      --without-ocf
+    make
+}
+
+package() {
+	mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+        cd src/glusterfs-${reltag}
+	cp COPYING-GPLV2 COPYING-LGPLV3 AUTHORS COMMITMENT MAINTAINERS  "$pkgdir/usr/share/doc/$pkgname"
+ 
+	make DESTDIR="$pkgdir" install
+
+	mv "$pkgdir/sbin/"* "$pkgdir/usr/sbin/"
+	rm -rf "$pkgdir/sbin"
+
+	rm -f "$pkgdir/usr/sbin/conf.py"
+	rm -f "$pkgdir/usr/sbin/gcron.py"
+
+	rm -rfv \
+		"$pkgdir/etc/ganesha" "$pkgdir/usr/libexec/ganesha" "$pkgdir/usr/lib/ocf/resource.d/heartbeat/ganesha"* \
+        	"$pkgdir/etc/bash_completion.d"
+
+	install -Dm 644 "$srcdir/glusterd.confd" "$pkgdir/etc/conf.d/glusterd"
+	install -Dm 755 "$srcdir/glusterd.initd" "$pkgdir/etc/init.d/glusterd"
+	install -Dm 755 "$srcdir/glustereventsd.initd" "$pkgdir/etc/init.d/glustereventsd"
+}
+
+xlators() {
+	pkgdesc="$pkgdesc (glusterfs xlators)"
+	depends="$pkgname-libs"
+	amove usr/lib/glusterfs/*/auth/*.so
+	amove usr/lib/glusterfs/*/rpc-transport/*.so
+	amove usr/lib/glusterfs/*/xlator/*/*.so
+	amove usr/lib/glusterfs/*/xlator/*.so
+}
+
+fuse() {
+	pkgdesc="$pkgdesc (glusterfs FUSE client)"
+	depends="$pkgname-libs $pkgname-xlators attr"
+	provides="$pkgname-client"
+
+	amove usr/sbin/glusterfs
+	amove usr/sbin/glusterfsd
+	amove usr/sbin/mount.glusterfs
+}
+
+libs() {
+	pkgdesc="$pkgdesc (core glusterfs libraries)"
+	depends=""
+
+	amove usr/lib/libglusterfs.so.*
+	amove usr/lib/libgf*.so.*
+}
+
+check() {
+	echo No tests...
+}
+
+sha512sums="
+837bd7833f9dd479260e9bac6abf3ace67c5ace5ca3fa2c86cac11fe9766eab5ed2909d071ae1eaff7231957a178507374a08921a31502c676de165528991b85  11.alpine.6.tar.gz
+cdf3918bbd4d91800cfb0a62346da9de92c71efc905211a33fcc11422ceb5928bad2b3f6358058362cfa913352adc4a2f12a128f28ca3fd8d15e7894f3b5ad50  glusterd.confd
+cc8a7ae041f0c13d6c6d73818fe475618dfddae7b66466f6fc4e42643bc8f0ca755525558238994bf96a2d4b766ca79783409a82a2d862836cdeb22c72aaf9b0  glusterd.initd
+a99222aa0b0bd5a18520fec0e56b489e96f3c1e9c5e364408c09adbb54db629d3091a4f1210a897500bbb81ee30c7492bd300101043a89897eeea0aacd1197a9  glustereventsd.initd
+"

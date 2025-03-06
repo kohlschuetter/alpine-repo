@@ -1,0 +1,52 @@
+# Contributor: Christian Kohlschütter <christian@kohlschutter.com>
+# Maintainer:
+pkgname=pam_ssh_agent_auth
+pkgver=0.10.4
+pkgrel=1
+pkgdesc="PAM module which permits PAM authentication via your keyring in a forwarded ssh-agent"
+url="https://github.com/jbeverly/pam_ssh_agent_auth"
+arch="all"
+license="OpenSSL"
+depends=""
+makedepends="linux-pam-dev openssl-dev perl"
+install=""
+subpackages="$pkgname-doc"
+source="https://github.com/jbeverly/pam_ssh_agent_auth/archive/pam_ssh_agent_auth-0.10.4.tar.gz
+https://github.com/floodyberry/ed25519-donna/archive/8757bd4cd209cb032853ece0ce413f122eef212c.zip
+sys-types.patch
+configure.patch
+"
+
+builddir="$srcdir/${pkgname}-${pkgname}-${pkgver}"
+
+build() {
+    rm -rf ed25519-donna
+    ln -s ../ed25519-donna-8757bd4cd209cb032853ece0ce413f122eef212c ed25519-donna
+
+    CFLAGS="-DHAVE___PROGNAME=1 -Wno-incompatible-pointer-types" ./configure \
+		--build=${CBUILD%-musl} \
+		--host=${CHOST%-musl} \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--libexecdir=/usr/lib/security \
+		--with-mantype=man \
+		--without-openssl-header-check
+
+	make
+}
+
+package() {
+	mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+	cp CONTRIBUTORS LICENSE.OpenSSL OPENSSH_LICENSE README "$pkgdir/usr/share/doc/$pkgname"
+ 
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+caccf72174d15e43f4c86a459ac6448682e62116557cf1e1e828955f3d1731595b238df42adec57860e7f341e92daf5d8285020bcb5018f3b8a5145aa32ee1c2  pam_ssh_agent_auth-0.10.4.tar.gz
+f9def47637c2cccafc44545518b52f3c59ea3e4569c4233ceb257c047fe24219ea6d31cf72ae71ecb0e0d600d7e0be183a39dec9f3a357474ccc9d65d0d5731e  8757bd4cd209cb032853ece0ce413f122eef212c.zip
+ed92873fd234925f181dc8991284b189e5d424512cf7bb99e4f98a5a083a70922e9fa75ec7e7726d7417a3473c865b6067799e16321f8f8ccf96b4c61009da89  sys-types.patch
+5980e8768ed01410ada8b039e003c4e42c999ef2a00697df42c94a86bbe7ec34221c7f626cfc3c1191e77ea5e17a4e98a6b2af23597ad54ec055719350b38989  configure.patch
+"
