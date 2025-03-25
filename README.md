@@ -30,7 +30,7 @@ When `apk update` tells you...
 
 ### `WARNING: updating and opening https://kohlschuetter.github.io/alpine-repo: No such file or directory`
 
-You may be running an unsupported machine configuration. Right now, only `x86_64` is supported.
+You may be running an unsupported machine configuration. Right now, only `x86_64` and `aarch64` are supported.
 
 ### `ERROR: https://kohlschuetter.github.io/alpine-repo/: UNTRUSTED signature`
 
