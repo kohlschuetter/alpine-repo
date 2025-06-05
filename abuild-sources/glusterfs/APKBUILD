@@ -2,12 +2,12 @@
 # Maintainer: Christian Kohlschütter <christian@kohlschutter.com>
 pkgname=glusterfs
 pkgver=11.1_git20250306
-pkgrel=1
+pkgrel=2
 pkgdesc="glusterfs"
 url="https://github.com/kohlschuetter/glusterfs"
 arch="all"
 license="GPL-2.0"
-depends="py3-requests py3-prettytable xfsprogs-extra
+depends="py3-requests py3-prettytable xfsprogs-extra bash tcmalloc-minimal
 	$pkgname-xlators
 	$pkgname-libs
 "
