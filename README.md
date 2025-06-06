@@ -10,6 +10,12 @@ To use, add the following line to `/etc/apk/repositories`:
 https://kohlschuetter.github.io/alpine-repo/
 ```
 
+For the time being, until `tcmalloc-minimal` appears in the main Alpine repository, you will need to add the official Alpine Edge Testing repository as well (or manually install `tcmalloc-minimal` beforehand):
+
+```
+https://dl-cdn.alpinelinux.org/alpine/edge/testing/
+```
+
 Make sure to also add the signing keys from [https://kohlschuetter.github.io/alpine-repo/keys/](https://kohlschuetter.github.io/alpine-repo/keys/): Copy them (e.g., `ck-6787e0df.rsa.pub` to `/etc/apk/keys`)
 
 ## Notable packages:
